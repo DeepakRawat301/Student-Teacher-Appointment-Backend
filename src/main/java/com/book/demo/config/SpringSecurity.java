@@ -170,7 +170,7 @@ public class SpringSecurity
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000","https://student-teacher-appointment-frontend-6u27divfa.vercel.app/") // Your React frontend URL
+                        .allowedOrigins("http://localhost:3000","https://student-teacher-appointment-frontend-r2kx-6iknyt058.vercel.app/") // Your React frontend URL
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
