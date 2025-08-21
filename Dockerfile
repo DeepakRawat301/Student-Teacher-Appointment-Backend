@@ -1,12 +1,15 @@
-# Stage 1: Build the application
+# Stage 1: Build
 FROM eclipse-temurin:21-jdk AS build
 
 WORKDIR /app
 
-# Copy Maven wrapper and pom.xml first (for dependency caching)
+# Copy Maven wrapper and pom.xml
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
+
+# ✅ Give permission to mvnw
+RUN chmod +x mvnw
 
 # Download dependencies
 RUN ./mvnw dependency:go-offline -B
@@ -14,19 +17,16 @@ RUN ./mvnw dependency:go-offline -B
 # Copy source code
 COPY src src
 
-# Build the application (skip tests to speed up)
-RUN ./mvnw clean package -DskipTests
+# Build the application
+RUN ./mvnw package -DskipTests
 
-# Stage 2: Run the application with a smaller image
+# Stage 2: Run
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copy only the built JAR file
 COPY --from=build /app/target/*.jar app.jar
 
-# Render will pass the port as $PORT
 EXPOSE 8080
 
-# Run Spring Boot app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
