@@ -19,8 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -36,22 +34,23 @@ public class SpringSecurity {
         CustomAuthenticationFilter customFilter = new CustomAuthenticationFilter(authenticationManager());
         customFilter.setFilterProcessesUrl("/login");
 
-        return http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // Enable CORS
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight
-                        .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
-                .addFilterAt(customFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable())    // disable default login form
-                .httpBasic(basic -> basic.disable())  // disable basic auth popup
-                .build();
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> {}) // Enable CORS
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow preflight
+                    .requestMatchers("/public/**").permitAll()
+                    .requestMatchers("/login").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
+            .addFilterAt(customFilter, UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable());
+
+        return http.build();
     }
 
     @Bean
@@ -67,13 +66,11 @@ public class SpringSecurity {
         return new BCryptPasswordEncoder();
     }
 
-    // CORS configuration for Spring Security
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "https://student-teacher-appointment-frontend-r2kx-6iknyt058.vercel.app"
+            "https://student-teacher-appointment-frontend-r2kx-6iknyt058.vercel.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
@@ -82,23 +79,5 @@ public class SpringSecurity {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    // Optional: CORS for MVC controllers
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(
-                                "http://localhost:3000",
-                                "https://student-teacher-appointment-frontend-r2kx-6iknyt058.vercel.app"
-                        )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
     }
 }
