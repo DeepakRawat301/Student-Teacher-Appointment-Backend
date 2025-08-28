@@ -1,9 +1,11 @@
 package com.book.demo.dto;
 
+import com.book.demo.entity.AppointmentEntity;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class AppointmentDto
-{
+public class AppointmentDto {
+
     private String id;
     private String status;
     private String message;
@@ -17,93 +19,61 @@ public class AppointmentDto
     private String teacherUsername;
     private String teacherName;
 
-    public String getId() {
-        return id;
+    public AppointmentDto(AppointmentEntity appointment) {
+        this.id = appointment.getApid().toHexString();
+        this.date = appointment.getDate();
+        this.startTime = appointment.getStartTime();
+        this.endTime = appointment.getEndTime();
+        this.message = appointment.getMessage();
+        this.status = appointment.getStatus();
+
+        if (appointment.getUsername() != null) {
+            this.teacherUsername = appointment.getUsername().getUsername();
+            this.teacherName = appointment.getUsername().getName();
+        }
+
+        if (appointment.getStudentusername() != null) {
+            this.studentUsername = appointment.getStudentusername().getUsername();
+            this.studentName = appointment.getStudentusername().getName();
+        }
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    // ----- Getters and Setters -----
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public String getStatus() {
-        return status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 
-    public String getMessage() {
-        return message;
-    }
+    public LocalDateTime getDate() { return date; }
+    public void setDate(LocalDateTime date) { this.date = date; }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
 
-    public LocalDateTime getDate() {
-        return date;
-    }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
+    public String getStudentUsername() { return studentUsername; }
+    public void setStudentUsername(String studentUsername) { this.studentUsername = studentUsername; }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
+    public String getStudentName() { return studentName; }
+    public void setStudentName(String studentName) { this.studentName = studentName; }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
+    public String getTeacherUsername() { return teacherUsername; }
+    public void setTeacherUsername(String teacherUsername) { this.teacherUsername = teacherUsername; }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
+    public String getTeacherName() { return teacherName; }
+    public void setTeacherName(String teacherName) { this.teacherName = teacherName; }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
+    public AppointmentDto() {}
 
-    public String getStudentUsername() {
-        return studentUsername;
-    }
-
-    public void setStudentUsername(String studentUsername) {
-        this.studentUsername = studentUsername;
-    }
-
-    public String getStudentName() {
-        return studentName;
-    }
-
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
-    }
-
-    public String getTeacherUsername() {
-        return teacherUsername;
-    }
-
-    public void setTeacherUsername(String teacherUsername) {
-        this.teacherUsername = teacherUsername;
-    }
-
-    public String getTeacherName() {
-        return teacherName;
-    }
-
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
-    }
-
-    public AppointmentDto() {
-        // no-argument constructor
-    }
-
-    public AppointmentDto(String id, String teacherUsername, String studentUsername, String teacherName, String studentName,
-                          LocalDateTime date, LocalDateTime startTime, LocalDateTime endTime,
-                          String message, String status) {
+    public AppointmentDto(String id, String teacherUsername, String studentUsername, String teacherName,
+                          String studentName, LocalDateTime date, LocalDateTime startTime,
+                          LocalDateTime endTime, String message, String status) {
         this.id = id;
         this.teacherUsername = teacherUsername;
         this.studentUsername = studentUsername;
@@ -116,5 +86,16 @@ public class AppointmentDto
         this.status = status;
     }
 
+    // ✅ Extra: if you still want formatted strings for frontend
+    public String getFormattedDate() {
+        return (date != null) ? date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) : null;
+    }
 
+    public String getFormattedStartTime() {
+        return (startTime != null) ? startTime.format(DateTimeFormatter.ofPattern("hh:mm a")) : null;
+    }
+
+    public String getFormattedEndTime() {
+        return (endTime != null) ? endTime.format(DateTimeFormatter.ofPattern("hh:mm a")) : null;
+    }
 }

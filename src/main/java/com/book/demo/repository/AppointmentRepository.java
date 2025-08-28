@@ -23,4 +23,6 @@ public interface AppointmentRepository extends MongoRepository<AppointmentEntity
     );
 
     List<AppointmentEntity>findAll();
+    List<AppointmentEntity> findByStudentusername(StudentEntity student);
+
 }

@@ -106,17 +106,18 @@ public class TeacherController
     }
 
     @GetMapping("/teacher/appointments")
-    public ResponseEntity<?>getAppointmentsForTeacher()
-    {
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        String username=authentication.getName();
+    public ResponseEntity<?> getAppointmentsForTeacher() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         try {
-            List<AppointmentEntity> appointments = appointmentService.getAppointmentsForTeacher(username);
-            return ResponseEntity.ok(appointments);
+            List<AppointmentDto> response = appointmentService.getAppointmentsForTeacher(username);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
 
     @Autowired
     private AppointmentRepository appointmentRepository;
@@ -154,6 +155,7 @@ public class TeacherController
             return dto;
         }).collect(Collectors.toList());
     }
+
 
 
 

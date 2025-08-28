@@ -2,6 +2,7 @@ package com.book.demo.controller;
 
 import com.book.demo.dto.AppointmentDto;
 import com.book.demo.entity.AppointmentEntity;
+import com.book.demo.entity.StudentEntity;
 import com.book.demo.entity.TeacherEntity;
 import com.book.demo.repository.AppointmentRepository;
 import com.book.demo.service.AppointmentService;
@@ -10,8 +11,11 @@ import com.book.demo.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -85,37 +89,29 @@ public class StudentController
     private AppointmentRepository appointmentRepository;
 
     @GetMapping("/appointments")
-    public List<AppointmentDto> getAppointments(@RequestParam(required = false) String studentUsername) {
-        List<AppointmentEntity> appointments;
+    public ResponseEntity<?> getAppointmentsForStudent() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
 
-        // If teacherUsername is provided, filter appointments by teacher
-        if (studentUsername != null && !studentUsername.isEmpty()) {
-            appointments = appointmentRepository.findByUsername_Username(studentUsername);
-        } else {
-            appointments = appointmentRepository.findAll();
+        try {
+            StudentEntity student = studentService.findByUsername(username);
+            if (student == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found");
+            }
+
+            // Fetch all appointments for this student
+            List<AppointmentEntity> appointments = appointmentRepository.findByStudentusername(student);
+
+            // Map to DTO
+            List<AppointmentDto> response = appointments.stream()
+                    .map(AppointmentDto::new) // Use your constructor directly
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-        return appointments.stream().map(app -> {
-            AppointmentDto dto = new AppointmentDto();
-            dto.setId(app.getApid().toHexString());
-            dto.setDate(app.getDate());
-            dto.setStartTime(app.getStartTime());
-            dto.setEndTime(app.getEndTime());
-            dto.setMessage(app.getMessage());
-            dto.setStatus(app.getStatus());
-
-            if (app.getUsername() != null) {
-                dto.setTeacherUsername(app.getUsername().getUsername());
-                dto.setTeacherName(app.getUsername().getName());
-            }
-
-            if (app.getStudentusername() != null) {
-                dto.setStudentUsername(app.getStudentusername().getUsername());
-                dto.setStudentName(app.getStudentusername().getName());
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
     }
 
 

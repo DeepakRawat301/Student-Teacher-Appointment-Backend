@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService
@@ -94,13 +95,39 @@ public class AppointmentService
         return appointmentRepository.findAll();
     }
 
-    public List<AppointmentEntity> getAppointmentsForTeacher(String teacherUsername) {
+    public List<AppointmentDto> getAppointmentsForTeacher(String teacherUsername) {
         TeacherEntity teacher = teacherRespository.findByUsername(teacherUsername);
         if (teacher == null) {
             throw new RuntimeException("Teacher not found");
         }
-        return appointmentRepository.findByusername(teacher);
+
+        List<AppointmentEntity> appointments = appointmentRepository.findByusername(teacher);
+
+        return appointments.stream().map(app -> {
+            AppointmentDto dto = new AppointmentDto();
+            dto.setId(app.getApid().toHexString());
+            dto.setDate(app.getDate());
+            dto.setStartTime(app.getStartTime());
+            dto.setEndTime(app.getEndTime());
+            dto.setMessage(app.getMessage());
+            dto.setStatus(app.getStatus());
+
+            if (app.getUsername() != null) {
+                dto.setTeacherUsername(app.getUsername().getUsername());
+                dto.setTeacherName(app.getUsername().getName());
+            }
+
+            // Explicitly fetch student
+            StudentEntity student = app.getStudentusername();
+            if (student != null) {
+                dto.setStudentUsername(student.getUsername());
+                dto.setStudentName(student.getName());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
+
 
 
 
