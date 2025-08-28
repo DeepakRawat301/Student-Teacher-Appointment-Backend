@@ -70,7 +70,7 @@ public class SpringSecurity {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "https://student-teacher-appointment-fronten.vercel.app/" // no trailing slash
+                "https://student-teacher-appointment-fronten.vercel.app" // no trailing slash
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
